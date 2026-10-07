@@ -16,7 +16,10 @@ main { max-width: 1100px; margin: 0 auto; padding: 12px 20px 60px; }
 .status { font-size: 11px; letter-spacing: 1px; margin-top: 4px; }
 .status.held { color: #39ff6a; }
 .status.moved { color: #ffb62e; }
-section#protocol, section#buyinfo { background: #1a2012; border: 1px solid #3a4a2a; border-radius: 10px; padding: 16px; margin-top: 16px; }
+section#protocol, section#buyinfo, section.panel { background: #1a2012; border: 1px solid #3a4a2a; border-radius: 10px; padding: 16px; margin-top: 16px; }
+section.panel input { background: #0a0d06; color: #e4e8d4; border: 1px solid #4a5a3a; border-radius: 4px; padding: 6px 8px; font: inherit; margin: 2px 0; }
+section.panel button { background: #2a3a1a; color: #ffd75a; border: 1px solid #6a7a4a; border-radius: 4px; padding: 6px 12px; font: inherit; cursor: pointer; }
+section.panel button:disabled { opacity: .4; cursor: not-allowed; }
 pre { background: #0a0d06; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
 #modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; }
 #modal[hidden] { display: none; }

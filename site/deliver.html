@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TwonkLab — deliver a token</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Deliver a token</h1>
+  <p>For tokens you've sold: move the Twonk to the buyer's address. Your key signs
+  <b>in this page only</b> — it is never sent anywhere. Only the signed transaction leaves.</p>
+  <p><a href="index.html">← back to collection</a></p>
+</header>
+<main>
+  <section id="step-key" class="panel">
+    <h2>1 · Seller key</h2>
+    <p>Paste the WIF of the key that currently owns the token. It stays in this tab's memory.</p>
+    <input id="wif" type="password" placeholder="L… or K… (WIF)" autocomplete="off" size="56">
+    <button id="wif-go">Load</button>
+    <button id="wif-forget" disabled>Forget</button>
+    <div id="wif-out" class="meta"></div>
+  </section>
+  <section id="step-token" class="panel">
+    <h2>2 · Token</h2>
+    <div id="token-list" class="meta">Load a key first.</div>
+    <p>Or enter any outpoint manually: <input id="manual-out" placeholder="txid:vout" size="70"></p>
+  </section>
+  <section id="step-buyer" class="panel">
+    <h2>3 · Buyer + fee</h2>
+    <p>Buyer address: <input id="buyer" placeholder="1…" size="40"></p>
+    <p>Fee (sats): <input id="fee" value="1500" size="8">
+    Funding: <span id="fund-out" class="meta">auto</span>
+    <input id="manual-fund" placeholder="override funding txid:vout (optional)" size="70"></p>
+    <button id="build" disabled>Sign transfer</button>
+  </section>
+  <section id="step-send" class="panel">
+    <h2>4 · Review + broadcast</h2>
+    <div id="review" class="meta">Nothing signed yet.</div>
+    <button id="send" disabled>Broadcast</button>
+    <div id="send-out" class="meta"></div>
+  </section>
+</main>
+<script src="deliver.bundle.js"></script>
+</body>
+</html>
