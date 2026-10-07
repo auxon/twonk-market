@@ -1,0 +1,336 @@
+{
+ "collection": {
+  "name": "TwonkLab",
+  "description": "Permissionless test collection: 10 tokens minted outside Twetch in the identical Twonk script format to prove the protocol is open.",
+  "contractId": "fa421c7f4a1caf782a1397f889f58113708dc9abb6133ae9855f8672d0f55690",
+  "bindingHash": "749fd13e711cade0afe8d377dff4e309672e22b9",
+  "total": 10,
+  "dustSats": 546,
+  "mintTxid": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c",
+  "mintBlock": 970084,
+  "duplicateMintTxid": "f48c7dc15a0f65d14d9b800ff72b806ed8993b42f9f2b408057dc80e6d9700b8",
+  "duplicateMintBlock": 970084,
+  "duplicateBurnTxid": "8be7ca5cd81793e213940dc44cb684ea246c2f823e716adf99a0e01995dfebd1",
+  "duplicateBurnNote": "accidental second broadcast of the same 10 tokens; burned to P2PKH in one tx",
+  "transferTxid": "230048c3e48bff6eb22893b610ff8227258c6937a03f7d8c04048197754c98b7",
+  "transferNote": "TWONKLAB #1 moved A->B, proving third-party transferability"
+ },
+ "tokens": [
+  {
+   "number": 1,
+   "title": "TWONKLAB #1",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Crimson"
+    },
+    {
+     "trait": "Frame",
+     "value": "Copper"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Circle"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "3ab64f205cace9b8a53a4e94558f09d035591afd5c04e37ed255d1adb31ea6f5",
+   "image": "img/twonk-1.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:10",
+   "owner": "1Bv4wgSatZYLzv5Lz9JNCaHMqmn87UcuNp",
+   "outpoint": "230048c3e48bff6eb22893b610ff8227258c6937a03f7d8c04048197754c98b7:0",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:10",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    },
+    {
+     "event": "transfer",
+     "txid": "230048c3e48bff6eb22893b610ff8227258c6937a03f7d8c04048197754c98b7",
+     "outpoint": "230048c3e48bff6eb22893b610ff8227258c6937a03f7d8c04048197754c98b7:0",
+     "owner": "1Bv4wgSatZYLzv5Lz9JNCaHMqmn87UcuNp"
+    }
+   ]
+  },
+  {
+   "number": 2,
+   "title": "TWONKLAB #2",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Ocean"
+    },
+    {
+     "trait": "Frame",
+     "value": "Silver"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Square"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "51ee4f50542e20890e90d5b37ec956203ed06b43e4a9e42b3aec2fe695de9b0b",
+   "image": "img/twonk-2.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:11",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:11",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:11",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 3,
+   "title": "TWONKLAB #3",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Forest"
+    },
+    {
+     "trait": "Frame",
+     "value": "Gold"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Diamond"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "6f815893403f2bde7ad4ad489e6fbe7d3e5fab2822dbc90a14b7646e1a5cfb97",
+   "image": "img/twonk-3.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:12",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:12",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:12",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 4,
+   "title": "TWONKLAB #4",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Sunset"
+    },
+    {
+     "trait": "Frame",
+     "value": "Copper"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Circle"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "f47fa37bbb693e28f5f5a46ed500ba0c48a3302e7d13b466eff1d61591561429",
+   "image": "img/twonk-4.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:13",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:13",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:13",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 5,
+   "title": "TWONKLAB #5",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Midnight"
+    },
+    {
+     "trait": "Frame",
+     "value": "Silver"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Square"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "8fefa0f600c11d9a798baed6cdb4b76948c8dcaa64c1fbd6f4843db02edca19d",
+   "image": "img/twonk-5.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:14",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:14",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:14",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 6,
+   "title": "TWONKLAB #6",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Lava"
+    },
+    {
+     "trait": "Frame",
+     "value": "Gold"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Diamond"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "398ad715e1d054dd5ebd12e88ee897704f3bd1bd55d255dd8976b9463a7681e4",
+   "image": "img/twonk-6.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:15",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:15",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:15",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 7,
+   "title": "TWONKLAB #7",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Mint"
+    },
+    {
+     "trait": "Frame",
+     "value": "Copper"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Circle"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "68439b2346debbcb7b0c41a5f334b03c96b4b7ec5cf4d07f22757c47acd0b41f",
+   "image": "img/twonk-7.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:16",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:16",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:16",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 8,
+   "title": "TWONKLAB #8",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Royal"
+    },
+    {
+     "trait": "Frame",
+     "value": "Silver"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Square"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "ba2df0824a1ea8d0e918fa80bf4d1c96ec419f68beede4a4d93bffdc9923a5af",
+   "image": "img/twonk-8.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:17",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:17",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:17",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 9,
+   "title": "TWONKLAB #9",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Sand"
+    },
+    {
+     "trait": "Frame",
+     "value": "Gold"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Diamond"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "8e7ad73e6bad893aa6e56b2db53e09609416431606b184a0ccf47f45190dd589",
+   "image": "img/twonk-9.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:18",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:18",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:18",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  },
+  {
+   "number": 10,
+   "title": "TWONKLAB #10",
+   "attributes": [
+    {
+     "trait": "Background",
+     "value": "Slate"
+    },
+    {
+     "trait": "Frame",
+     "value": "Copper"
+    },
+    {
+     "trait": "Glyph",
+     "value": "Circle"
+    }
+   ],
+   "description": "Permissionless test token: minted outside Twetch in the identical Twonk script format.",
+   "imageSha256": "dabca122e30017d6e085ed2f8d6dbc7e415b9fb08fae85745e9a16294b4a0f88",
+   "image": "img/twonk-10.jpg",
+   "mintOutpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:19",
+   "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg",
+   "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:19",
+   "history": [
+    {
+     "event": "mint",
+     "outpoint": "0576d15033d01b67e4bf1dbabd40e456104fb3f499ba5505405f7190bc9b637c:19",
+     "owner": "1DyiFMyp9uCvW5NsziawodWFU3Bzo28Wfg"
+    }
+   ]
+  }
+ ]
+}

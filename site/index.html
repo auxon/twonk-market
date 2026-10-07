@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TwonkLab — a permissionless Twonk collection</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>TwonkLab</h1>
+  <p id="collection-desc">Loading…</p>
+  <div id="collection-meta" class="meta"></div>
+</header>
+<main>
+  <section id="grid" aria-live="polite"></section>
+  <section id="protocol">
+    <h2>The protocol is open</h2>
+    <p>Every token below is a <b>546-sat UTXO</b> in the exact on-chain format Twetch uses for Twonks —
+    minted without touching Twetch, from an ordinary BSV wallet:</p>
+    <pre>OP_HASH160 &lt;H1&gt; OP_EQUALVERIFY
+OP_DUP OP_HASH160 &lt;H2&gt; OP_EQUALVERIFY OP_CHECKSIG
+OP_RETURN &lt;{"attributes":[…],"image":"b://…","number":N,"title":"…"}&gt;</pre>
+    <ul>
+      <li><b>H1</b> = HASH160(raw 32-byte collection id) — a public tag, not a permission.</li>
+      <li><b>H2</b> = owner's pubkey hash. Unlock order: <b>&lt;sig&gt; &lt;pubkey&gt; &lt;collection-id&gt;</b>.</li>
+      <li>BSV's OP_RETURN semantics keep these spendable: after CHECKSIG the top item is true.</li>
+      <li>Proven here: TWONKLAB #1 moved wallets (<a id="xfer-link" href="#">transfer tx</a>), and an
+      accidental double-mint was burned back to plain sats (<a id="burn-link" href="#">burn tx</a>).</li>
+    </ul>
+    <p>Minter: <code>bsv twonk-mint</code> in bsvOS walletd (<code>src/twonk.ts</code>) ·
+    wallet never exposes keys; transfers sign offline with a held WIF (<code>tools/transfer.mjs</code>).</p>
+  </section>
+  <section id="buyinfo">
+    <h2>How buying works</h2>
+    <p>One atomic swap transaction: buyer funds + seller's token in →
+    payment to seller + token re-issued to buyer's key + marketplace fee + buyer change.
+    No escrow, no custodial hop. Trade execution UI is next; the construction is documented
+    and already proven by the #1 transfer.</p>
+  </section>
+</main>
+<div id="modal" hidden><div id="modal-card"></div></div>
+<script src="app.js"></script>
+</body>
+</html>

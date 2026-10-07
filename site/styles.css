@@ -1,0 +1,27 @@
+:root { color-scheme: dark; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #101408; color: #e4e8d4; }
+header { padding: 28px 20px 8px; max-width: 1100px; margin: 0 auto; }
+h1 { color: #ffd75a; letter-spacing: 1px; margin: 0 0 6px; }
+.meta, .meta a, dl a, section a { color: #9ab89a; }
+.meta code, dd code { color: #ffd75a; font-size: 12px; }
+main { max-width: 1100px; margin: 0 auto; padding: 12px 20px 60px; }
+#grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin: 18px 0 30px; }
+.card { background: #1a2012; border: 1px solid #3a4a2a; border-radius: 10px; padding: 10px; cursor: pointer; }
+.card:hover { border-color: #ffd75a; }
+.card img { width: 100%; border-radius: 6px; display: block; }
+.card h3 { margin: 8px 0 4px; font-size: 15px; }
+.traits { display: flex; gap: 4px; flex-wrap: wrap; }
+.traits span { font-size: 11px; background: #2a3418; border-radius: 4px; padding: 2px 6px; }
+.own { font-size: 11px; color: #9ab89a; margin-top: 6px; }
+.status { font-size: 11px; letter-spacing: 1px; margin-top: 4px; }
+.status.held { color: #39ff6a; }
+.status.moved { color: #ffb62e; }
+section#protocol, section#buyinfo { background: #1a2012; border: 1px solid #3a4a2a; border-radius: 10px; padding: 16px; margin-top: 16px; }
+pre { background: #0a0d06; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+#modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; }
+#modal[hidden] { display: none; }
+#modal-card { background: #1a2012; border: 1px solid #ffd75a; border-radius: 12px; padding: 18px; max-width: 420px; width: 92vw; position: relative; }
+#modal-card img { width: 100%; border-radius: 8px; }
+#mx { position: absolute; top: 8px; right: 8px; background: #40181a; color: #ff9a92; border: 1px solid #7a2a2e; border-radius: 4px; cursor: pointer; }
+dt { color: #9ab89a; font-size: 11px; letter-spacing: 1px; margin-top: 8px; }
+dd { margin: 2px 0 0; font-size: 13px; word-break: break-all; }
