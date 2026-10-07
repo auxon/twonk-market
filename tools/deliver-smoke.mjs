@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 const bundle = fs.readFileSync(new URL("../site/deliver.bundle.js", import.meta.url), "utf8");
 const registry = JSON.parse(fs.readFileSync(new URL("../site/registry.json", import.meta.url), "utf8"));
-const keys = JSON.parse(fs.readFileSync(process.env.TWONK_KEYS || "/tmp/twonk-keys.json", "utf8"));
+const keys = JSON.parse(fs.readFileSync(process.env.TWONK_KEYS || (process.env.HOME + "/.config/twonk-market/keys.json"), "utf8"));
 
 const els = {};
 function el(id) {
