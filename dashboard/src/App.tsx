@@ -21,6 +21,33 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState<WatchConfig | null>(null);
+  // Raw text for numeric fields: parsing on every keystroke breaks decimal
+  // entry (typing "0." collapses to 0), so the text lives here until save.
+  const [raw, setRaw] = useState<Record<string, string>>({});
+
+  type NumKey = "maxPriceSats" | "discountVsFloor" | "feeBps" | "paperBankrollSats" | "pollSecs" | "jevMinConfidence" | "jevMaxPerCycle";
+
+  const setNum = useCallback(
+    (key: NumKey, text: string, nullable = false) => {
+      setRaw((r) => ({ ...r, [key]: text }));
+      const t = text.trim();
+      if (t === "") {
+        if (nullable) setDraft((d) => (d ? { ...d, [key]: null } : d));
+        return;
+      }
+      const n = Number(t);
+      if (Number.isFinite(n)) setDraft((d) => (d ? ({ ...d, [key]: n } as WatchConfig) : d));
+    },
+    [],
+  );
+
+  const numVal = (key: NumKey): string => {
+    if (raw[key] !== undefined) return raw[key];
+    const v = draft?.[key];
+    return v == null ? "" : String(v);
+  };
+
+  const rawInvalid = Object.entries(raw).some(([, v]) => v.trim() !== "" && !Number.isFinite(Number(v)));
 
   const refresh = useCallback(async () => {
     try {
@@ -54,18 +81,19 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
   }, [refresh]);
 
   const onSave = useCallback(async () => {
-    if (!draft) return;
+    if (!draft || rawInvalid) return;
     setBusy(true);
     try {
       await saveConfig(draft);
       setConfig(draft);
+      setRaw({});
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "save failed");
     } finally {
       setBusy(false);
     }
-  }, [draft]);
+  }, [draft, rawInvalid]);
 
   const onReset = useCallback(
     async (mode: "bankroll" | "all") => {
@@ -73,6 +101,7 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
       setBusy(true);
       try {
         await reset(mode);
+        setRaw({});
         setDraft(null);
         await refresh();
       } catch (e) {
@@ -170,19 +199,19 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
               <input value={draft.collections.join(", ")} onChange={(e) => setDraft({ ...draft, collections: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })} />
             </label>
             <label>Max price (sats, empty = none)
-              <input value={draft.maxPriceSats ?? ""} inputMode="numeric" onChange={(e) => setDraft({ ...draft, maxPriceSats: e.target.value.trim() === "" ? null : Number(e.target.value) })} />
+              <input value={numVal("maxPriceSats")} inputMode="numeric" onChange={(e) => setNum("maxPriceSats", e.target.value, true)} />
             </label>
             <label>Discount vs floor (0.15 = 15% under)
-              <input value={String(draft.discountVsFloor)} inputMode="decimal" onChange={(e) => setDraft({ ...draft, discountVsFloor: Number(e.target.value) })} />
+              <input value={numVal("discountVsFloor")} inputMode="decimal" onChange={(e) => setNum("discountVsFloor", e.target.value)} />
             </label>
             <label>Fee bps on closes (690 ≈ 6.9%)
-              <input value={String(draft.feeBps)} inputMode="numeric" onChange={(e) => setDraft({ ...draft, feeBps: Number(e.target.value) })} />
+              <input value={numVal("feeBps")} inputMode="numeric" onChange={(e) => setNum("feeBps", e.target.value)} />
             </label>
             <label>Paper bankroll (sats)
-              <input value={String(draft.paperBankrollSats)} inputMode="numeric" onChange={(e) => setDraft({ ...draft, paperBankrollSats: Number(e.target.value) })} />
+              <input value={numVal("paperBankrollSats")} inputMode="numeric" onChange={(e) => setNum("paperBankrollSats", e.target.value)} />
             </label>
             <label>Poll seconds (loop mode)
-              <input value={String(draft.pollSecs)} inputMode="numeric" onChange={(e) => setDraft({ ...draft, pollSecs: Number(e.target.value) })} />
+              <input value={numVal("pollSecs")} inputMode="numeric" onChange={(e) => setNum("pollSecs", e.target.value)} />
             </label>
             <label>Jev screen (buy/hold/sell judge, needs OPENROUTER_API_KEY)
               <select value={draft.jevEnabled ? "on" : "off"} onChange={(e) => setDraft({ ...draft, jevEnabled: e.target.value === "on" })}>
@@ -191,16 +220,17 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
               </select>
             </label>
             <label>Jev min confidence (0–1)
-              <input value={String(draft.jevMinConfidence)} inputMode="decimal" onChange={(e) => setDraft({ ...draft, jevMinConfidence: Number(e.target.value) })} />
+              <input value={numVal("jevMinConfidence")} inputMode="decimal" onChange={(e) => setNum("jevMinConfidence", e.target.value)} />
             </label>
             <label>Jev max judgements per cycle
-              <input value={String(draft.jevMaxPerCycle)} inputMode="numeric" onChange={(e) => setDraft({ ...draft, jevMaxPerCycle: Number(e.target.value) })} />
+              <input value={numVal("jevMaxPerCycle")} inputMode="numeric" onChange={(e) => setNum("jevMaxPerCycle", e.target.value)} />
             </label>
           </div>
         )}
         <p className="row">
-          <button disabled={busy || !dirty} onClick={() => void onSave()}>Save rules</button>
+          <button disabled={busy || !dirty || rawInvalid} onClick={() => void onSave()}>Save rules</button>
           {!dirty && <span className="fine">applies to the next cycle</span>}
+          {rawInvalid && <span className="err">fix the highlighted number first</span>}
         </p>
       </section>
     </main>
