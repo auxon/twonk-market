@@ -1,0 +1,16 @@
+{
+  "name": "Twonk Watch",
+  "short_name": "TwonkWatch",
+  "start_url": "http://127.0.0.3:8791/",
+  "icons": [],
+  "metanet": {
+    "schemaVersion": "1",
+    "groupPermissions": {
+      "description": "Twonk Watch: read-only market monitor and paper trader. The dashboard never spends; live buys (if you ever graduate a rule) go through the wallet daemon under origin caps you approve.",
+      "spendingAuthorization": {
+        "amount": 0,
+        "description": "no spending — monitor and paper trades only"
+      }
+    }
+  }
+}

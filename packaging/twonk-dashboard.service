@@ -1,0 +1,15 @@
+[Unit]
+Description=Twonk Watch dashboard (loopback UI + API)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/twonk-market
+ExecStart=/usr/bin/node %h/twonk-market/dashboard/server.mjs
+Restart=always
+RestartSec=10
+# Needs `npm run dashboard:build` once first (dashboard/dist is gitignored).
+
+[Install]
+WantedBy=default.target

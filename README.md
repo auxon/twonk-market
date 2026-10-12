@@ -63,6 +63,28 @@ Reads are `bsv twetch market <listings|sales|collections>` — the daemon must
 be running. Graduate a proven rule to live buys via `bsv twetchBuy` inside an
 agent sub-wallet budget, never by editing this tool.
 
+## Dashboard (view + manage, loopback only)
+
+React + TypeScript + Vite SPA with a zero-dep Node server on `127.0.0.3:8791`:
+bankroll + realized P&L, open signals, closed trades, collection floors, rule
+editor, run-now, bankroll reset / full wipe. Verified in headless Chromium.
+
+```bash
+npm run dashboard:build   # install + tsc + vite build -> dashboard/dist
+node dashboard/server.mjs # http://127.0.0.3:8791/ (loopback only)
+```
+
+Run it always:
+
+```bash
+cp packaging/twonk-watch.service packaging/twonk-dashboard.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now twonk-watch twonk-dashboard
+```
+
+Or install as a bsvOS app (own loopback origin): `bsv app install 127.0.0.3 --manifest-file dashboard/manifest.json` —
+see below. `GET /api/state` is the whole dashboard as JSON.
+
 ## Next
 
 Trade execution UI (seller-side signing service for atomic swaps), collection creator

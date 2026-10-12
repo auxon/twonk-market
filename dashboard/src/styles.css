@@ -1,0 +1,30 @@
+body{background:#0b0e13;color:#e8ecf2;font:15px/1.55 system-ui,sans-serif;margin:0}
+#root{max-width:62rem;margin:0 auto;padding:1.5rem 1rem 4rem}
+a{color:#7dd3fc}
+header{display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap}
+header h1{margin:.2rem 0}
+.bank{margin-left:auto;text-align:right}
+.bank b{font-size:1.4rem}
+section{margin-top:1.8rem}
+.card{border:1px solid #2a3348;border-radius:.75rem;padding:1rem;margin:.7rem 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:.4rem .3rem;border-bottom:1px solid #1c2333;text-align:left;vertical-align:top}
+th{color:#8b94a7;font-weight:600}
+.fine{color:#8b94a7;font-size:.85rem}
+.err{color:#fda4af}
+.win{color:#6ee7b7}
+.loss{color:#fda4af}
+button{background:#7dd3fc;color:#0b0e13;border:0;border-radius:.5rem;padding:.55rem 1rem;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+button.ghost{background:transparent;color:#7dd3fc;border:1px solid #2a3348}
+button.danger{background:transparent;color:#fda4af;border:1px solid #5b2a33}
+button + button{margin-left:.5rem}
+input,select{width:100%;box-sizing:border-box;background:#131926;color:#e8ecf2;border:1px solid #2a3348;border-radius:.5rem;padding:.5rem;font:inherit;margin:.25rem 0}
+label{display:block;margin:.5rem 0}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;padding:.1rem .5rem;border-radius:999px;background:#1c2333;margin-right:.35rem}
+.pill.open{background:#12332a;color:#6ee7b7}
+.pill.sold{background:#1c2333;color:#8b94a7}
+code{font-size:.82em}

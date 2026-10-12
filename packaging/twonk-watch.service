@@ -1,0 +1,14 @@
+[Unit]
+Description=Twonk Watch market monitor (paper trades, no sats move)
+After=network-online.target bsv-walletd.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/twonk-market
+ExecStart=/usr/bin/node %h/twonk-market/tools/watch.mjs --loop
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

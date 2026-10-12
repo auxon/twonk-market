@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "node tools/watch.mjs",
+    "dashboard:build": "npm --prefix dashboard install && npm --prefix dashboard run build",
+    "dashboard:serve": "node dashboard/server.mjs"
   },
   "keywords": [],
   "author": "",
