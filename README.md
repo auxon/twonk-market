@@ -40,7 +40,28 @@ OP_RETURN <{"attributes":[…],"image":"b://…","number":N,"title":"…"}>
 - `img/` — token artwork (bytes also on-chain in mint outputs 0–9, sha256-pinned).
 - `site/` — static marketplace (grid, detail, live held/moved via WoC, protocol docs).
 - `tools/transfer.mjs` — offline transfer/burn signer (held WIFs via env, never committed).
+- `tools/watch.mjs` — market monitor + paper trader (zero deps, Node only).
 - `worker/` — Cloudflare static-asset deployment.
+
+## Watch (monitor + paper trades, no sats move)
+
+Polls Twetch's live market through the bsvOS daemon, scores new listings
+against collection floors, and paper-trades the mispriced ones — then settles
+each signal against later sales/delistings to score the strategy.
+
+```bash
+node tools/watch.mjs            # one cycle (50 live listings, ~34 floors)
+node tools/watch.mjs --loop     # poll every pollSecs (default 300s)
+node tools/watch.mjs --json     # machine-readable summary
+```
+
+Rules live in `tools/watch.config.json`: collections allowlist (empty = all),
+`maxPriceSats` cap, `discountVsFloor` (default 0.15), `feeBps` on paper closes
+(default 690 ≈ the observed ~6.9%), `paperBankrollSats` play money (signals
+beyond it log as UNFUNDED, not bought). State in `data/watch-state.json`.
+Reads are `bsv twetch market <listings|sales|collections>` — the daemon must
+be running. Graduate a proven rule to live buys via `bsv twetchBuy` inside an
+agent sub-wallet budget, never by editing this tool.
 
 ## Next
 

@@ -1,0 +1,8 @@
+{
+  "collections": [],
+  "maxPriceSats": null,
+  "discountVsFloor": 0.15,
+  "feeBps": 690,
+  "paperBankrollSats": 10000000,
+  "pollSecs": 300
+}
