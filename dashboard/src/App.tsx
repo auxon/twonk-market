@@ -3,8 +3,19 @@ import { fmtSats, getState, reset, runCycle, saveConfig, type WatchConfig, type 
 
 const POLL_MS = 30_000;
 
-export default function App() {
-  const [config, setConfig] = useState<WatchConfig | null>(null);
+function jevLabel(t: { jev?: { decision: string; confidence: number | null } | null }): string {
+  if (!t.jev || !t.jev.decision) return "rules-only";
+  const c = t.jev.confidence;
+  return `jev:${t.jev.decision}${c != null ? ` ${c.toFixed(2)}` : ""}`;
+}
+
+function outcome(t: { status: string; closePriceSats?: number }): string {
+  if (t.status === "closed-sold") return `sold ${fmtSats(t.closePriceSats)}`;
+  if (t.status === "closed-abandoned") return "abandoned (jev:sell)";
+  return "delisted";
+}
+
+export default function App() {  const [config, setConfig] = useState<WatchConfig | null>(null);
   const [state, setState] = useState<WatchState | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -105,7 +116,7 @@ export default function App() {
         {open.length === 0 && <p className="fine">Nothing under the rule right now.</p>}
         {open.map((t) => (
           <div key={t.id} className="card">
-            <div><span className="pill open">open paper</span><b><a href={t.url} target="_blank" rel="noreferrer">{t.name}</a></b></div>
+            <div><span className="pill open">open paper</span><b><a href={t.url} target="_blank" rel="noreferrer">{t.name}</a></b> <span className="fine">[{jevLabel(t)}]</span></div>
             <div>buy {fmtSats(t.priceSats)} · floor {fmtSats(t.floorSats)} · {t.reasons.join("; ")}</div>
             <div className="fine">opened {new Date(t.openedAt).toLocaleString()} · <code>{t.outpoint.slice(0, 18)}…</code></div>
           </div>
@@ -120,9 +131,9 @@ export default function App() {
             <tbody>
               {closed.map((t) => (
                 <tr key={t.id}>
-                  <td><a href={t.url} target="_blank" rel="noreferrer">{t.name}</a></td>
+                  <td><a href={t.url} target="_blank" rel="noreferrer">{t.name}</a> <span className="fine">[{jevLabel(t)}]</span></td>
                   <td>{fmtSats(t.priceSats)}</td>
-                  <td>{t.status === "closed-sold" ? `sold ${fmtSats(t.closePriceSats)}` : "delisted"}</td>
+                  <td>{outcome(t)}</td>
                   <td className={t.status === "closed-sold" ? ((t.pnlSats ?? 0) >= 0 ? "win" : "loss") : ""}>
                     {t.status === "closed-sold" ? `${(t.pnlSats ?? 0) >= 0 ? "+" : ""}${fmtSats(t.pnlSats)}` : "—"}
                   </td>
@@ -172,6 +183,18 @@ export default function App() {
             </label>
             <label>Poll seconds (loop mode)
               <input value={String(draft.pollSecs)} inputMode="numeric" onChange={(e) => setDraft({ ...draft, pollSecs: Number(e.target.value) })} />
+            </label>
+            <label>Jev screen (buy/hold/sell judge, needs OPENROUTER_API_KEY)
+              <select value={draft.jevEnabled ? "on" : "off"} onChange={(e) => setDraft({ ...draft, jevEnabled: e.target.value === "on" })}>
+                <option value="on">on</option>
+                <option value="off">off</option>
+              </select>
+            </label>
+            <label>Jev min confidence (0–1)
+              <input value={String(draft.jevMinConfidence)} inputMode="decimal" onChange={(e) => setDraft({ ...draft, jevMinConfidence: Number(e.target.value) })} />
+            </label>
+            <label>Jev max judgements per cycle
+              <input value={String(draft.jevMaxPerCycle)} inputMode="numeric" onChange={(e) => setDraft({ ...draft, jevMaxPerCycle: Number(e.target.value) })} />
             </label>
           </div>
         )}

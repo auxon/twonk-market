@@ -63,6 +63,16 @@ Reads are `bsv twetch market <listings|sales|collections>` — the daemon must
 be running. Graduate a proven rule to live buys via `bsv twetchBuy` inside an
 agent sub-wallet budget, never by editing this tool.
 
+**Jev screen** (`tools/jev.mjs`, needs `OPENROUTER_API_KEY`): every
+rule-passing candidate gets one buy/hold choice from Jev
+(`typesafe/jev-1.13`); only confident buys open paper trades, the rest log as
+HOLD with the verdict. Open trades get a hold/sell screen — a confident sell
+abandons the paper position. `jevMinConfidence` (default 0.6) and
+`jevMaxPerCycle` (default 10, entries first) bound cost to ~$0.0002/cycle.
+Without a key, entries fall back to rules-only, flagged `[rules-only]` in the
+output and dashboard — paper risks nothing, so nothing fails closed except
+live buys, which don't exist yet.
+
 ## Dashboard (view + manage, loopback only)
 
 React + TypeScript + Vite SPA with a zero-dep Node server on `127.0.0.3:8791`:

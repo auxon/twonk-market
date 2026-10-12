@@ -6,11 +6,20 @@ export interface WatchConfig {
   feeBps: number;
   paperBankrollSats: number;
   pollSecs: number;
+  jevEnabled: boolean;
+  jevMinConfidence: number;
+  jevMaxPerCycle: number;
+}
+
+export interface JevVerdict {
+  decision: string;
+  confidence: number | null;
+  at?: string;
 }
 
 export interface PaperTrade {
   id: string;
-  status: "open" | "closed-sold" | "closed-gone";
+  status: "open" | "closed-sold" | "closed-gone" | "closed-abandoned";
   openedAt: string;
   listingId: number;
   name: string;
@@ -21,6 +30,8 @@ export interface PaperTrade {
   floorSats: number;
   reasons: string[];
   url: string;
+  jev?: JevVerdict | null;
+  exitJev?: JevVerdict | null;
   closePriceSats?: number;
   netSats?: number;
   pnlSats?: number;

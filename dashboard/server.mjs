@@ -99,7 +99,17 @@ function validateConfig(raw) {
   if (!Number.isInteger(pollSecs) || pollSecs < 30) {
     throw new Error("pollSecs must be an integer >= 30");
   }
-  return { collections, maxPriceSats, discountVsFloor, feeBps, paperBankrollSats, pollSecs };
+  const { jevEnabled, jevMinConfidence, jevMaxPerCycle } = raw;
+  if (typeof jevEnabled !== "boolean") {
+    throw new Error("jevEnabled must be a boolean");
+  }
+  if (typeof jevMinConfidence !== "number" || !(jevMinConfidence >= 0 && jevMinConfidence <= 1)) {
+    throw new Error("jevMinConfidence must be a number in [0, 1]");
+  }
+  if (!Number.isInteger(jevMaxPerCycle) || jevMaxPerCycle < 1 || jevMaxPerCycle > 50) {
+    throw new Error("jevMaxPerCycle must be an integer 1..50");
+  }
+  return { collections, maxPriceSats, discountVsFloor, feeBps, paperBankrollSats, pollSecs, jevEnabled, jevMinConfidence, jevMaxPerCycle };
 }
 
 function serveStatic(req, res) {

@@ -16,12 +16,21 @@
  * against collection id or name, empty = all), maxPriceSats cap,
  * discountVsFloor (signal when price <= floor*(1-d)), feeBps applied on
  * paper closes (default 690 = the ~6.9% observed on NOOGIES #2108),
- * paperBankrollSats starting play money, pollSecs loop interval.
+ * paperBankrollSats starting play money, pollSecs loop interval,
+ * jevEnabled + jevMinConfidence + jevMaxPerCycle for the Jev screen.
+ *
+ * The Jev screen (needs OPENROUTER_API_KEY): each rule-passing candidate
+ * gets one buy/hold choice; only confident buys open paper trades, the rest
+ * log as HOLD with the verdict. Open trades get a hold/sell screen; confident
+ * sells abandon the paper position. Without a key (or with jevEnabled false)
+ * entries fall back to rules-only, flagged as such — paper never spends, so
+ * nothing fails closed except live buys, which don't exist yet.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { jevConfigured, jevDecide } from "./jev.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -41,6 +50,19 @@ const DEFAULT_CONFIG = {
   paperBankrollSats: 10_000_000,
   pollSecs: 300,
   stateDir: join(here, "..", "data"),
+  jevEnabled: true,
+  jevMinConfidence: 0.6,
+  jevMaxPerCycle: 10,
+};
+
+/** Choice sets for the Jev screen. Entries buy or pass; exits hold or bail. */
+const ENTRY_OPTIONS = {
+  buy: "buy now at this price versus the collection floor — a genuine mispricing",
+  hold: "pass — fairly priced, overpriced, or too uncertain to buy",
+};
+const EXIT_OPTIONS = {
+  hold: "keep tracking this open paper position",
+  sell: "abandon — exit the paper position now, the edge is gone",
 };
 
 function loadConfig() {
@@ -94,8 +116,10 @@ function saveState(dir, state) {
   writeFileSync(join(dir, "watch-state.json"), JSON.stringify(state, null, 2));
 }
 
-function cycle(cfg, state) {
-  const report = { at: new Date().toISOString(), signals: [], settled: [], unfunded: [], errors: [] };
+async function cycle(cfg, state) {
+  const report = { at: new Date().toISOString(), signals: [], settled: [], held: [], unfunded: [], errors: [] };
+  const jev = { enabled: cfg.jevEnabled === true, configured: jevConfigured(), judged: 0 };
+  report.jev = jev;
   let listings = [];
   let sales = [];
   let collections = [];
@@ -156,7 +180,30 @@ function cycle(cfg, state) {
     }
   }
 
-  // Score new listings.
+  // Jev exit screen: hold or abandon each surviving open trade.
+  for (const t of state.paper) {
+    if (t.status !== "open") continue;
+    if (!jev.enabled || !jev.configured || jev.judged >= cfg.jevMaxPerCycle) continue;
+    try {
+      const v = await jevDecide(
+        { position: t.name, collection: t.collection, paid_sats: t.priceSats, floor_sats: t.floorSats },
+        EXIT_OPTIONS,
+      );
+      jev.judged++;
+      t.exitJev = { ...v, at: report.at };
+      if (v.decision === "sell" && v.confidence >= cfg.jevMinConfidence) {
+        t.status = "closed-abandoned";
+        t.closedAt = report.at;
+        state.bankrollSats += t.priceSats; // abandoned: funds return, no fee, no sale
+        report.settled.push(t);
+      }
+    } catch (e) {
+      report.errors.push(`jev exit ${t.name}: ${e.message}`);
+    }
+  }
+
+  // Score new listings: rules first (free), bankroll second, Jev last (paid).
+  let keyWarned = false;
   for (const l of listings) {
     if (l.status && l.status !== "listed") continue;
     if (state.seen[l.id]) continue;
@@ -171,6 +218,42 @@ function cycle(cfg, state) {
       report.unfunded.push({ name: l.name, priceSats: l.priceSats, floorSats: floor, reason, url: l.url });
       continue;
     }
+    // Jev entry screen: buy, or hold with the verdict on record.
+    let entryJev = null;
+    if (jev.enabled) {
+      if (!jev.configured) {
+        if (!keyWarned) {
+          report.errors.push("jev: no key (export OPENROUTER_API_KEY) — entries are rules-only this cycle");
+          keyWarned = true;
+        }
+      } else if (jev.judged >= cfg.jevMaxPerCycle) {
+        report.held.push({ name: l.name, priceSats: l.priceSats, decision: "hold", confidence: null, note: "jev budget spent" });
+        continue;
+      } else {
+        try {
+          entryJev = await jevDecide(
+            {
+              listing: l.name,
+              collection: l.collectionName ?? l.collection,
+              price_sats: l.priceSats,
+              floor_sats: floor,
+              discount_pct: pct,
+              rarity: l.rarity,
+            },
+            ENTRY_OPTIONS,
+          );
+          jev.judged++;
+        } catch (e) {
+          report.held.push({ name: l.name, priceSats: l.priceSats, decision: "hold", confidence: null, note: `jev failed: ${e.message}` });
+          report.errors.push(`jev entry ${l.name}: ${e.message}`);
+          continue;
+        }
+        if (entryJev.decision !== "buy" || entryJev.confidence < cfg.jevMinConfidence) {
+          report.held.push({ name: l.name, priceSats: l.priceSats, decision: entryJev.decision, confidence: entryJev.confidence, note: "below bar" });
+          continue;
+        }
+      }
+    }
     const trade = {
       id: `paper_${l.id}`,
       status: "open",
@@ -184,6 +267,7 @@ function cycle(cfg, state) {
       floorSats: floor,
       reasons: [reason],
       url: l.url,
+      jev: entryJev ? { ...entryJev, at: report.at } : null,
     };
     state.paper.push(trade);
     state.bankrollSats -= l.priceSats;
@@ -196,10 +280,21 @@ function cycle(cfg, state) {
   return report;
 }
 
+function jevBadge(t) {
+  const j = t.jev ?? t.exitJev;
+  if (!j || !j.decision) return "rules-only";
+  return `jev:${j.decision} ${(j.confidence ?? 0).toFixed(2)}`;
+}
+
 function printHuman(cfg, report) {
-  console.log(`watch ${report.at} — ${report.listingsSeen} listings live, bankroll ${report.bankrollSats} sats (${report.openTrades} open)`);
+  const j = report.jev;
+  const jevNote = j.enabled ? (j.configured ? `jev on (${j.judged} judged)` : "jev off (no key)") : "jev off (disabled)";
+  console.log(`watch ${report.at} — ${report.listingsSeen} listings live, bankroll ${report.bankrollSats} sats (${report.openTrades} open) [${jevNote}]`);
   for (const t of report.signals) {
-    console.log(`PAPER BUY ${t.name} @ ${t.priceSats} sats (${t.reasons.join("; ")}) floor ${t.floorSats} ${t.url}`);
+    console.log(`PAPER BUY ${t.name} @ ${t.priceSats} sats (${t.reasons.join("; ")}) floor ${t.floorSats} [${jevBadge(t)}] ${t.url}`);
+  }
+  for (const h of report.held) {
+    console.log(`HOLD ${h.name} @ ${h.priceSats} sats (jev:${h.decision ?? "?"}${h.confidence != null ? ` ${h.confidence.toFixed(2)}` : ""}${h.note ? ` — ${h.note}` : ""})`);
   }
   for (const u of report.unfunded) {
     console.log(`UNFUNDED ${u.name} @ ${u.priceSats} sats exceeds bankroll (${u.reason}) ${u.url}`);
@@ -207,6 +302,8 @@ function printHuman(cfg, report) {
   for (const t of report.settled) {
     if (t.status === "closed-sold") {
       console.log(`CLOSED ${t.name}: sold ${t.closePriceSats} (net ${t.netSats}) pnl ${t.pnlSats >= 0 ? "+" : ""}${t.pnlSats} sats`);
+    } else if (t.status === "closed-abandoned") {
+      console.log(`CLOSED ${t.name}: abandoned on jev:sell [${jevBadge(t)}], funds returned`);
     } else {
       console.log(`CLOSED ${t.name}: gone (delisted/expired), funds returned`);
     }
@@ -214,7 +311,7 @@ function printHuman(cfg, report) {
   for (const e of report.errors) console.error(`warn: ${e}`);
 }
 
-function main() {
+async function main() {
   const cfg = loadConfig();
   mkdirSync(cfg.stateDir, { recursive: true });
   const asJson = process.argv.includes("--json");
@@ -222,7 +319,7 @@ function main() {
 
   do {
     const state = loadState(cfg.stateDir);
-    const report = cycle(cfg, state);
+    const report = await cycle(cfg, state);
     saveState(cfg.stateDir, state);
     if (asJson) console.log(JSON.stringify(report));
     else printHuman(cfg, report);

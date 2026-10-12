@@ -4,5 +4,8 @@
   "discountVsFloor": 0.15,
   "feeBps": 690,
   "paperBankrollSats": 10000000,
-  "pollSecs": 300
+  "pollSecs": 300,
+  "jevEnabled": true,
+  "jevMinConfidence": 0.6,
+  "jevMaxPerCycle": 10
 }
