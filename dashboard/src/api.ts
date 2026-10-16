@@ -2,13 +2,23 @@
 export interface WatchConfig {
   collections: string[];
   maxPriceSats: number | null;
-  discountVsFloor: number;
+  rankTopN: number;
   feeBps: number;
   paperBankrollSats: number;
   pollSecs: number;
   jevEnabled: boolean;
   jevMinConfidence: number;
   jevMaxPerCycle: number;
+  dropsEnabled: boolean;
+  dropsPollLimit: number;
+  dropsWebhookUrl: string | null;
+  dropsKeywords: string[];
+  liveBuyEnabled: boolean;
+  liveBuyDryRun: boolean;
+  liveBuyMaxUsd: number;
+  liveBuyMinConfidence: number;
+  liveBuyMaxPerCycle: number;
+  liveBuyQuantity: number;
 }
 
 export interface JevVerdict {
@@ -49,6 +59,40 @@ export interface WatchState {
   floors: Record<string, Floor>;
   paper: PaperTrade[];
   bankrollSats: number | null;
+  dropsSeen?: Record<string, string>;
+  drops?: DropAlert[];
+  dropsCheckedAt?: string | null;
+  liveBuys?: LiveBuyAction[];
+}
+
+export interface LiveBuyAction {
+  dropId: number;
+  contract: string | null;
+  kind: string;
+  at: string;
+  action: "bought" | "dryrun" | "held" | "skipped" | "failed";
+  reason: string;
+  status?: { live?: boolean; available?: number; supply?: number; mintEnded?: boolean } | null;
+  quote?: { attemptId?: string; quantity?: number; subtotalSats?: number; maximumDebitSats?: number } | null;
+  jev?: { decision: string; confidence: number | null } | null;
+  priceUsd?: number | null;
+  capSats?: number | null;
+  mintPriceUsd?: number | null;
+  buyTxid?: string | null;
+}
+
+export interface DropAlert {
+  id: number;
+  txid: string | null;
+  content: string;
+  snippet: string;
+  postUrl: string;
+  links: string[];
+  kind: "drop" | "update";
+  reasons: string[];
+  detectedAt: string;
+  postedAtMs: number;
+  notified?: boolean;
 }
 
 export interface StateResponse {

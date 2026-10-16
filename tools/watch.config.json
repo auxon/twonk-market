@@ -1,11 +1,21 @@
 {
   "collections": [],
   "maxPriceSats": null,
-  "discountVsFloor": 0.15,
+  "rankTopN": 10,
   "feeBps": 690,
-  "paperBankrollSats": 10000000,
+  "paperBankrollSats": 1000000000,
   "pollSecs": 300,
   "jevEnabled": true,
   "jevMinConfidence": 0.6,
-  "jevMaxPerCycle": 10
+  "jevMaxPerCycle": 10,
+  "dropsEnabled": true,
+  "dropsPollLimit": 20,
+  "dropsWebhookUrl": null,
+  "dropsKeywords": [],
+  "liveBuyEnabled": false,
+  "liveBuyDryRun": true,
+  "liveBuyMaxUsd": 6,
+  "liveBuyMinConfidence": 0.7,
+  "liveBuyMaxPerCycle": 1,
+  "liveBuyQuantity": 1
 }

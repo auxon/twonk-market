@@ -25,7 +25,7 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
   // entry (typing "0." collapses to 0), so the text lives here until save.
   const [raw, setRaw] = useState<Record<string, string>>({});
 
-  type NumKey = "maxPriceSats" | "discountVsFloor" | "feeBps" | "paperBankrollSats" | "pollSecs" | "jevMinConfidence" | "jevMaxPerCycle";
+  type NumKey = "maxPriceSats" | "rankTopN" | "feeBps" | "paperBankrollSats" | "pollSecs" | "jevMinConfidence" | "jevMaxPerCycle" | "dropsPollLimit" | "liveBuyMaxUsd" | "liveBuyMinConfidence" | "liveBuyMaxPerCycle" | "liveBuyQuantity";
 
   const setNum = useCallback(
     (key: NumKey, text: string, nullable = false) => {
@@ -118,13 +118,17 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
   const closed = paper.filter((t) => t.status !== "open").slice().reverse();
   const pnl = paper.filter((t) => typeof t.pnlSats === "number").reduce((s, t) => s + (t.pnlSats ?? 0), 0);
   const floors = Object.entries(state?.floors ?? {}).sort((a, b) => b[1].floorSats - a[1].floorSats);
+  const drops = [...(state?.drops ?? [])].reverse();
+  const freshCutoff = Date.now() - 24 * 3600 * 1000;
+  const freshDrops = drops.filter((d) => new Date(d.detectedAt).getTime() >= freshCutoff);
+  const liveBuys = [...(state?.liveBuys ?? [])].reverse();
   const dirty = draft != null && config != null && JSON.stringify(draft) !== JSON.stringify(config);
 
   return (
     <main>
       <header>
         <h1>🔭 Twonk Watch</h1>
-        <span className="fine">paper-trading TwetchCollector floors · no sats move</span>
+        <span className="fine">paper-trading floors{config?.liveBuyEnabled ? " + Jev-gated live drop buys (real BSV)" : " · paper only"}</span>
         <div className="bank">
           <div className="fine">paper bankroll</div>
           <b>{fmtSats(state?.bankrollSats)} sats</b>
@@ -139,6 +143,62 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
         <button className="danger" disabled={busy} onClick={() => void onReset("all")}>Wipe state</button>
         <span className="fine">{updatedAt ? `state updated ${new Date(updatedAt).toLocaleString()}` : state ? "no cycles yet" : "connecting…"}</span>
       </p>
+
+      <section>
+        <h2>💸 Live drop buys {config && !config.liveBuyEnabled && <span className="fine">(off — enable in Rules)</span>}</h2>
+        <p className="fine">
+          Jev-gated launchpad mints with real BSV (default ${config?.liveBuyMaxUsd ?? 6} cap)
+          {config && config.liveBuyEnabled && (config.liveBuyDryRun ? " · DRY RUN (nothing spends)" : " · ARMED — real spends")}
+        </p>
+        {liveBuys.length === 0 && <p className="fine">No evaluations yet — fresh drops land here with the verdict.</p>}
+        {liveBuys.slice(0, 20).map((a, i) => (
+          <div key={`${a.dropId}-${a.at}-${i}`} className="card">
+            <div>
+              <span className={`pill ${a.action === "bought" ? "open" : "sold"}`}>{a.action}</span>
+              <b>@0 #{a.dropId}</b>{" "}
+              <span className="fine">{a.contract ? <code>{a.contract.slice(0, 12)}…</code> : "(no contract)"}</span>
+            </div>
+            <div>{a.reason}</div>
+            <div className="fine">
+              {new Date(a.at).toLocaleString()}
+              {a.quote?.subtotalSats != null && <> · quote {fmtSats(a.quote.subtotalSats)} sats{a.mintPriceUsd != null && <> (~${a.mintPriceUsd})</>}</>}
+              {a.jev && <> · jev:{a.jev.decision} {a.jev.confidence?.toFixed(2)}</>}
+              {a.buyTxid && <> · <code>{a.buyTxid.slice(0, 16)}…</code></>}
+              {a.status && a.status.available != null && <> · {a.status.available}/{a.status.supply} avail</>}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section>
+        <h2>🔔 Twonk drops — @0 {freshDrops.length > 0 && <span className="pill open">{freshDrops.length} new</span>}</h2>
+        <p className="fine">
+          Official Twetch posts watched every cycle
+          {state?.dropsCheckedAt ? ` · last checked ${new Date(state.dropsCheckedAt).toLocaleString()}` : ""}
+          {config && !config.dropsEnabled && " · paused (enable in Rules)"}
+        </p>
+        {drops.length === 0 && <p className="fine">No drops seen yet — run a cycle and they’ll land here.</p>}
+        {drops.slice(0, 20).map((d) => {
+          const fresh = new Date(d.detectedAt).getTime() >= freshCutoff;
+          return (
+            <div key={d.id} className="card">
+              <div>
+                <span className={`pill ${d.kind === "drop" ? "open" : "sold"}`}>{d.kind === "drop" ? "drop" : "update"}</span>
+                {fresh && <span className="pill open">new</span>}
+                <b><a href={d.postUrl} target="_blank" rel="noreferrer">@0 #{d.id}</a></b>{" "}
+                <span className="fine">{d.reasons.join(" · ")}</span>
+              </div>
+              <div>{d.snippet || "(no text — see post)"}</div>
+              <div className="fine">
+                detected {new Date(d.detectedAt).toLocaleString()}
+                {d.links.slice(0, 3).map((l) => (
+                  <span key={l}> · <a href={l} target="_blank" rel="noreferrer">{l.replace(/^https?:\/\//, "").slice(0, 48)}</a></span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </section>
 
       <section>
         <h2>Open signals ({open.length})</h2>
@@ -201,8 +261,8 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
             <label>Max price (sats, empty = none)
               <input value={numVal("maxPriceSats")} inputMode="numeric" onChange={(e) => setNum("maxPriceSats", e.target.value, true)} />
             </label>
-            <label>Discount vs floor (0.15 = 15% under)
-              <input value={numVal("discountVsFloor")} inputMode="decimal" onChange={(e) => setNum("discountVsFloor", e.target.value)} />
+            <label>Rank top N (cheapest N vs floor go to Jev each cycle)
+              <input value={numVal("rankTopN")} inputMode="numeric" onChange={(e) => setNum("rankTopN", e.target.value)} />
             </label>
             <label>Fee bps on closes (690 ≈ 6.9%)
               <input value={numVal("feeBps")} inputMode="numeric" onChange={(e) => setNum("feeBps", e.target.value)} />
@@ -224,6 +284,45 @@ export default function App() {  const [config, setConfig] = useState<WatchConfi
             </label>
             <label>Jev max judgements per cycle
               <input value={numVal("jevMaxPerCycle")} inputMode="numeric" onChange={(e) => setNum("jevMaxPerCycle", e.target.value)} />
+            </label>
+            <label>Drop alerts from @0 (official Twetch posts)
+              <select value={draft.dropsEnabled ? "on" : "off"} onChange={(e) => setDraft({ ...draft, dropsEnabled: e.target.value === "on" })}>
+                <option value="on">on</option>
+                <option value="off">off</option>
+              </select>
+            </label>
+            <label>Drop check depth (posts per cycle, 5–100)
+              <input value={numVal("dropsPollLimit")} inputMode="numeric" onChange={(e) => setNum("dropsPollLimit", e.target.value)} />
+            </label>
+            <label>Drop webhook URL (optional, POST on each new drop)
+              <input value={draft.dropsWebhookUrl ?? ""} placeholder="https://… (empty = none)" onChange={(e) => setDraft({ ...draft, dropsWebhookUrl: e.target.value.trim() === "" ? null : e.target.value.trim() })} />
+            </label>
+            <label>Extra drop keywords (comma-separated, optional)
+              <input value={(draft.dropsKeywords ?? []).join(", ")} onChange={(e) => setDraft({ ...draft, dropsKeywords: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })} />
+            </label>
+            <label>Live drop buys — real BSV mints from the launchpad (Jev-gated)
+              <select value={draft.liveBuyEnabled ? "on" : "off"} onChange={(e) => setDraft({ ...draft, liveBuyEnabled: e.target.value === "on" })}>
+                <option value="off">off (paper + alerts only)</option>
+                <option value="on">on (needs TWETCH_MINT_WIF + Jev key)</option>
+              </select>
+            </label>
+            <label>Dry run (evaluate + Jev, cancel before spending)
+              <select value={draft.liveBuyDryRun ? "on" : "off"} onChange={(e) => setDraft({ ...draft, liveBuyDryRun: e.target.value === "on" })}>
+                <option value="on">on (safe — nothing spends)</option>
+                <option value="off">off (ARMED — real spends)</option>
+              </select>
+            </label>
+            <label>Max USD per mint (default 6)
+              <input value={numVal("liveBuyMaxUsd")} inputMode="decimal" onChange={(e) => setNum("liveBuyMaxUsd", e.target.value)} />
+            </label>
+            <label>Jev min confidence for live buys (0–1)
+              <input value={numVal("liveBuyMinConfidence")} inputMode="decimal" onChange={(e) => setNum("liveBuyMinConfidence", e.target.value)} />
+            </label>
+            <label>Live evaluations per cycle (1–5)
+              <input value={numVal("liveBuyMaxPerCycle")} inputMode="numeric" onChange={(e) => setNum("liveBuyMaxPerCycle", e.target.value)} />
+            </label>
+            <label>Mint quantity per drop (1–100)
+              <input value={numVal("liveBuyQuantity")} inputMode="numeric" onChange={(e) => setNum("liveBuyQuantity", e.target.value)} />
             </label>
           </div>
         )}
