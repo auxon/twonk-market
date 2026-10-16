@@ -1,4 +1,5 @@
 /** Dashboard API client (same origin; vite proxies /api to the local server). */
+const API_BASE: string = (import.meta as unknown as { env: Record<string, string | undefined> }).env.VITE_API_BASE ?? "";
 export interface WatchConfig {
   collections: string[];
   maxPriceSats: number | null;
@@ -102,11 +103,21 @@ export interface StateResponse {
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: { "content-type": "application/json", ...(init?.headers ?? {}) },
   });
-  const json = (await res.json()) as T & { error?: { code?: string; message?: string } };
+  const text = await res.text();
+  let json: T & { error?: { code?: string; message?: string } };
+  try {
+    json = JSON.parse(text) as T & { error?: { code?: string; message?: string } };
+  } catch {
+    throw new Error(
+      res.ok
+        ? "dashboard API returned non-JSON (tunnel origin unreachable?)"
+        : `request failed (${res.status}) — home tunnel may be offline`,
+    );
+  }
   if (!res.ok) throw new Error(json.error?.message ?? `request failed (${res.status})`);
   return json;
 }
